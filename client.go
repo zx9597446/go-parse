@@ -14,13 +14,25 @@ import (
 const apiURL = "https://api.parse.com/1"
 
 type Client struct {
-	AppId       string
-	AppKey      string
-	MasterKey   string
-	UsingMaster bool
+	AppId         string
+	AppKey        string
+	MasterKey     string
+	UsingMaster   bool
+	DebugRequest  bool
+	DebugResponse bool
 }
 
-func (c *Client) request(method, url, body string) (*result, error) {
+func NewClient() *Client {
+	return &Client{
+		DebugRequest:  false,
+		DebugResponse: false,
+	}
+}
+
+func (c *Client) request(url, method, body string) (*result, error) {
+	if c.DebugRequest {
+		log.Println(method, url)
+	}
 	r, err := http.NewRequest(method, url, strings.NewReader(body))
 	if err != nil {
 		return nil, err
@@ -42,6 +54,9 @@ func (c *Client) request(method, url, body string) (*result, error) {
 	}
 	defer res.Body.Close()
 	sbody, _ := ioutil.ReadAll(res.Body)
+	if c.DebugResponse {
+		log.Println(sbody)
+	}
 	var location string
 	if u, err := res.Location(); err == nil {
 		location = u.String()

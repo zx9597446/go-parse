@@ -1,6 +1,11 @@
 package parse
 
-import "net/url"
+import (
+	"encoding/json"
+	"errors"
+	"net/url"
+	"strconv"
+)
 
 const classBaseURL = "classes"
 
@@ -33,23 +38,33 @@ func (c *Client) deleteObject(className, objectId string) (*result, error) {
 	return c.httpDelete(url)
 }
 
-func (c *Client) queryObject(className, whereJson, limit, skip, order, keys string) (*result, error) {
+func (c *Client) queryObjects(options QueryOptions) (*result, error) {
+	if options.Class == "" {
+		return nil, errors.New("require class name to query")
+	}
 	p := url.Values{}
-	if whereJson != "" {
-		p.Add("where", whereJson)
+	where, err := json.Marshal(options.Where)
+	if err != nil {
+		return nil, err
 	}
-	if limit != "" {
-		p.Add("limit", limit)
+	p.Add("where", string(where))
+	if options.Limit <= 0 {
+		options.Limit = DefaultLimit
 	}
-	if skip != "" {
-		p.Add("skip", skip)
+	p.Add("limit", strconv.Itoa(options.Limit))
+	p.Add("skip", strconv.Itoa(options.Skip))
+	if options.Order != "" {
+		p.Add("order", options.Order)
 	}
-	if order != "" {
-		p.Add("order", order)
+	if options.Keys != "" {
+		p.Add("keys", options.Keys)
 	}
-	if keys != "" {
-		p.Add("keys", keys)
+	if options.Include != "" {
+		p.Add("include", options.Include)
 	}
-	url := c.makeClassURL(className)
+	if options.Count {
+		p.Add("count", "1")
+	}
+	url := c.makeClassURL(options.Class)
 	return c.httpGet(url, p)
 }

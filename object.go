@@ -31,6 +31,14 @@ func FetchObject(c *Client, className, objectId, include string) (*Object, error
 	return r.Decode()
 }
 
+func QueryObjects(c *Client, options QueryOptions) (*Object, error) {
+	r, err := c.queryObjects(options)
+	if err != nil {
+		return nil, err
+	}
+	return r.Decode()
+}
+
 func DeleteObject(c *Client, className, objectId string) error {
 	if objectId == "" || className == "" {
 		return ErrNoObjectIdOrClassName
@@ -155,7 +163,7 @@ func NewDate(date string) Date {
 //iso 格式是以 ISO 8601 标准和毫秒级精度储存:YYYY-MM-DDTHH:MM:SS.MMMMZ
 func FormatDate(t time.Time) Date {
 	t1 := t.UTC()
-	s := fmt.Sprintf("%4d-%2d-%2dT%2d:%2d:%2d.%4dZ",
+	s := fmt.Sprintf("%04d-%02d-%02dT%02d:%02d:%02d.%04dZ",
 		t1.Year(), t1.Month(), t1.Day(), t1.Hour(), t1.Minute(), t1.Second(), t1.Nanosecond()%1e6/1e3)
 	return Date{"Date", s}
 }
