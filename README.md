@@ -12,8 +12,8 @@ quick usage
 1. config client:
 ```go
 	var parseClient = parse.NewClient()
-	parseClient.AppId = "WYGYhJ7RPkZwydZjGkEMvLOsKyAhUWzYQmynKQih"
-	parseClient.AppKey = "BgwJE5gcKwtHtf2IkaloagKSGitUCEqtJTr8BZcC"
+	parseClient.AppId = ""
+	parseClient.AppKey = ""
 	parseClient.DebugRequest = true
 ```
 
