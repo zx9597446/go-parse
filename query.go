@@ -1,5 +1,10 @@
 package parse
 
+import (
+	"encoding/json"
+	"log"
+)
+
 type WhereType string
 
 const OpLessThan = WhereType("$lt")
@@ -28,6 +33,15 @@ func (w WhereQuery) Add(left string, op WhereType, right interface{}) {
 
 func (w WhereQuery) AddEqualTo(left string, right interface{}) {
 	w[left] = right
+}
+
+func (w WhereQuery) ToJSON() string {
+	bs, err := json.Marshal(w)
+	if err != nil {
+		log.Println(err)
+		return ""
+	}
+	return string(bs)
 }
 
 const DefaultLimit = 100
